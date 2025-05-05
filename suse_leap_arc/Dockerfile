@@ -1,5 +1,5 @@
 FROM registry.opensuse.org/opensuse/leap:15.6
-LABEL org.opencontainers.image.source="https://github.com/aardsoft/ci-images"
+LABEL org.opencontainers.image.source="https://github.com/aard-fi/ci-images"
 
 ARG RUNNER_VERSION=2.323.0
 ARG TARGETPLATFORM
@@ -29,5 +29,10 @@ RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
 RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-container-hooks/releases/download/v${RUNNER_CONTAINER_HOOKS_VERSION}/actions-runner-hooks-k8s-${RUNNER_CONTAINER_HOOKS_VERSION}.zip \
     && unzip ./runner-container-hooks.zip -d ./k8s \
     && rm runner-container-hooks.zip
+
+RUN zypper -n in cvs make gcc gcc-c++
+
+RUN cvs -d :pserver:cvs@cvs.fefe.de:/cvs -z9 co dietlibc
+RUN cd dietlibc && make && make install && cd .. && rm -Rf dietlibc
 
 USER runner
